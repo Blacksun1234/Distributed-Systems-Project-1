@@ -13,7 +13,6 @@ system_start = datetime.datetime.now()
 resources = "MYRESOURCES"
 message = {}
 
-
 class CriticalSection():
     def __init__(self) -> None:
         self.time = 10
@@ -78,10 +77,12 @@ def tick(running, processes):
                 p.time = datetime.time(nt.hour, nt.minute, nt.second)
 
 
-def list(processes):
+def list(processes, criticalSection):
     # utility method to list proceeses
     for p in processes:
         print(f"P {str((p.id))}, {p.state.name}, {p.t}")
+    
+    print(f"Critical Section {criticalSection.time}")
 
 
 def time_p(processes, t):
@@ -89,6 +90,8 @@ def time_p(processes, t):
         random_t = random.randint(5, t)
         p.t = random_t
         
+def time_cs(criticalSection, t):
+    criticalSection.time = random.randint(5, t)
 
 
 def main(args):
@@ -113,7 +116,8 @@ def main(args):
 
     # start the main loop
     running = True
-
+    #Create the critical section object
+    criticalSection = CriticalSection()
     # start a separate thread for system tick
     # _thread.start_new_thread(tick, (running, processes))
 
@@ -133,11 +137,11 @@ def main(args):
         # handle list
         elif command == "list":
             try:
-                list(processes)
+                list(processes, criticalSection)
             except:
                 print("Error in list")
 
-        # handle kill
+        # handle time-p
         elif command == "time-p":
             try:
                 print("Command line ", int(cmd[1]))
@@ -145,6 +149,13 @@ def main(args):
             except:
                 print("Error in time")
 
+        # handle time-cs
+        elif command == "time-cs":
+            try:
+                print("Command line ", int(cmd[1]))
+                time_cs(criticalSection, int(cmd[1]))
+            except:
+                print("Error in time")
 
         # handle unsupported command        
         else:
