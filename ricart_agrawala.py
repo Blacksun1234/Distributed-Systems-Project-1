@@ -44,37 +44,20 @@ class Process:
             # self.update_clock()
 
 
-def bully_algorithm():
-    temp = 0
-    for p in processes:
-        if int(p.id) > temp:
-            temp = int(p.id)
-    return temp
-
-
 def tick(running, processes):
-    # program ticks evey second
-    # to update the coordinator time
-    # other processes update clock by Berkeley algorithm
+    # program ticks evey second to reduce the time out by a second
+    # to update all the processors time out
 
     while running:
-         # get the coordinator
-        coordinator = bully_algorithm()
-
         time.sleep(1)
         for p in processes:
-            #if p.coordinator and p.coordinator.id == p.id:
-            if int(p.id) == coordinator:
-                system_time = datetime.datetime.now()
-                # how much time passed since program started
-                time_diff = system_time - system_start
+            # Update all processors time - out
+            if p.t > 0:
+                p.t -= 1
+            elif p.t == 0:
+                p.state = State.WANTED
 
-                ct = p.set_time
-                today = datetime.date.today()
-                t = datetime.datetime(today.year, today.month,today.day, ct.hour, ct.minute, ct.second)
-                nt = t + time_diff
-                # update time based on difference
-                p.time = datetime.time(nt.hour, nt.minute, nt.second)
+            
 
 
 def list(processes, criticalSection):
@@ -118,8 +101,9 @@ def main(args):
     running = True
     #Create the critical section object
     criticalSection = CriticalSection()
+
     # start a separate thread for system tick
-    # _thread.start_new_thread(tick, (running, processes))
+    _thread.start_new_thread(tick, (running, processes))
 
     while running:
         inp = input().lower()
@@ -144,7 +128,6 @@ def main(args):
         # handle time-p
         elif command == "time-p":
             try:
-                print("Command line ", int(cmd[1]))
                 time_p(processes, int(cmd[1]))
             except:
                 print("Error in time")
@@ -152,7 +135,6 @@ def main(args):
         # handle time-cs
         elif command == "time-cs":
             try:
-                print("Command line ", int(cmd[1]))
                 time_cs(criticalSection, int(cmd[1]))
             except:
                 print("Error in time")
