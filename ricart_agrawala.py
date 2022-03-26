@@ -1,8 +1,8 @@
-from random import random
 import sys
 import datetime
 import _thread
 import time
+import random
 
 from state import State
 
@@ -12,6 +12,11 @@ processes = []
 system_start = datetime.datetime.now()
 resources = "MYRESOURCES"
 message = {}
+
+
+class CriticalSection():
+    def __init__(self) -> None:
+        self.time = 10
 
 
 class Process:
@@ -80,22 +85,14 @@ def list(processes):
 
 
 def time_p(processes, t):
-    print("time ", t)
     for p in processes:
         random_t = random.randint(5, t)
         p.t = random_t
         
 
 
-def remove_process(processes, id):
-    for p in processes:
-        if p.id == id:
-            processes.remove(p)
-
-
 def main(args):
     # main program function
-    print("args ", args)
     if len(args) > 1:
         try:
             # get the number of processes from terminal
@@ -143,6 +140,7 @@ def main(args):
         # handle kill
         elif command == "time-p":
             try:
+                print("Command line ", int(cmd[1]))
                 time_p(processes, int(cmd[1]))
             except:
                 print("Error in time")
