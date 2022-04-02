@@ -49,13 +49,15 @@ def tick(running, processes):
     # to update all the processors time out
 
     while running:
-        time.sleep(1)
+        # time.sleep(1)
         for p in processes:
             # Update all processors time - out
-            if p.t > 0:
-                p.t -= 1
-            elif p.t == 0:
-                p.state = State.WANTED
+            # if p.t > 0:
+            #     p.t -= 1
+            # elif p.t == 0:
+            #     p.state = State.WANTED
+            time.sleep(p.t)
+            p.state = State.WANTED
 
             
 
