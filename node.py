@@ -1,8 +1,10 @@
+from email import message
 import socket
 import time
 import threading
 import random
 import hashlib
+from state import State
 
 from nodeconnection import NodeConnection
 
@@ -72,6 +74,12 @@ class Node(threading.Thread):
         self.message_count_send = 0
         self.message_count_recv = 0
         self.message_count_rerr = 0
+
+        # Set the logical time for every Node
+        self.logical_time = time.monotonic()
+
+        # Set the default state to Do not want while starting the nodes
+        self.state = State.DO_NOT_WANT
         
         # Connection limit of inbound nodes (nodes that connect to us)
         self.max_connections = max_connections
@@ -345,6 +353,7 @@ class Node(threading.Thread):
     def node_message(self, node, data):
         """This method is invoked when a node send us a message."""
         self.debug_print("node_message: " + node.id + ": " + str(data))
+        print((self.id, "node_message: " + node.id + ": " + str(data)))
         if self.callback is not None:
             self.callback("node_message", self, node, data)
 
