@@ -1,9 +1,9 @@
-from email import message
 import socket
 import time
 import threading
 import random
 import hashlib
+from tkinter import S
 from state import State
 
 from nodeconnection import NodeConnection
@@ -76,7 +76,8 @@ class Node(threading.Thread):
         self.message_count_rerr = 0
 
         # Set the logical time for every Node
-        self.logical_time = time.monotonic()
+        self.logical_time = 5 + time.monotonic()
+        self.cs = 10
 
         # Set the default state to Do not want while starting the nodes
         self.state = State.DO_NOT_WANT
@@ -118,6 +119,18 @@ class Node(threading.Thread):
         print("Node connection overview:")
         print("- Total nodes connected with us: %d" % len(self.nodes_inbound))
         print("- Total nodes connected to     : %d" % len(self.nodes_outbound))
+    
+    # def set_state(self):
+    #     if self.state == State.DO_NOT_WANT:
+    #         self.time_out(self.logical_time, State.WANTED)
+    #     elif self.state == State.WANTED:
+    #         pass
+    #     elif self.state == State.HELD:
+    #         self.time_out(self.cs, State.DO_NOT_WANT)
+            
+    # def time_out(self, time_t, state):
+    #     time.sleep(time_t)
+    #     self.state = state
 
     def send_to_nodes(self, data, exclude=[]):
         """ Send a message to all the nodes that are connected with this node. data is a python variable which is
@@ -253,7 +266,7 @@ class Node(threading.Thread):
                     self.debug_print("reconnect_nodes: Removing node (" + node_to_check["host"] + ":" + str(node_to_check["port"]) + ") from the reconnection list!")
                     self.reconnect_to_nodes.remove(node_to_check)
 
-    def run(self):
+    def run(self):  
         """The main loop of the thread that deals with connections from other nodes on the network. When a
            node is connected it will exchange the node id's. First we receive the id of the connected node
            and secondly we will send our node id to the connected node. When connected the method
