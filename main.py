@@ -27,27 +27,12 @@ def node_callback(event, main_node, connected_node, data):
         message = "exception: " + str(e) 
 
 
-check = []
-
-def checker(el):
-    for i in check:
-        temp = i.split(",")
-        new = temp[1] + "," + temp[0]
-        if new == el:
-            return False
-        
-    return True
-
-
 
 def make_connections(sockets):
     for node_i in sorted(sockets, key=lambda node: node.id):
         for node_j in sorted(sockets, key=lambda node: node.id):
             if node_i.id != node_j.id:
-                test = checker(str(node_i) + "," + str(node_j))
-                if test:
-                    check.append(str(node_i) + "," + str(node_j))
-                    node_i.connect_with_node("localhost", node_j.port)
+                node_i.connect_with_node("localhost", node_j.port)
 
 
 def start(args):
@@ -117,8 +102,8 @@ def agrawala(sockets, running, number_of_processes):
             if node.state == State.DO_NOT_WANT:
                 time.sleep(node.logical_time)
                 node.state = State.WANTED
-                node.send_to_nodes(build_data("ask_cs", node.id, node.logical_time))
-               
+                node.send_to_nodes(build_data("ask_cs", node.id, node.logical_time, node.port))
+                
 
             elif node.state == State.HELD:
                 time.sleep(node.logical_time)

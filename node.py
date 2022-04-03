@@ -78,7 +78,6 @@ class Node(threading.Thread):
         # Set the logical time for every Node
         self.logical_time = 5 + time.monotonic()
         self.cs = 10
-        self.timestamp = 0
         # Set the default state to Do not want while starting the nodes
         self.state = State.DO_NOT_WANT
         
@@ -365,13 +364,19 @@ class Node(threading.Thread):
 
     def node_message(self, node, data):
         """This method is invoked when a node send us a message."""
-        event, sender_id, timestamp = extra_data(data)
+        event, sender_id, timestamp, port = extra_data(data)
         self.debug_print("node_message: " + sender_id + ": " + str(data))
-
+      
         if event == "ask_cs":
             if self.state ==  State.DO_NOT_WANT:
-                print("ok")
-                self.send_to_node(node, data)
+                print("\n"+self.id)
+                for i in self.nodes_outbound:
+                    print("OBJECT ----> ", i)
+                # self.send_to_node(node, build_data("ok",self.node.id, self.logical_time, port))
+                # node.send(build_data("ok",self.node.id, self.logical_time, port))
+            if self.state == State.WANTED:
+                if self.logical_time < float(timestamp):
+                    pass
         if event == "ok":
             for node in self.node_inbound:
                 print("Node ------>", node)
