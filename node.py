@@ -7,6 +7,7 @@ from tkinter import S
 from state import State
 
 from nodeconnection import NodeConnection
+from utilities import  build_data, extra_data
 
 """
 Author: Maurice Snoeren <macsnoeren(at)gmail.com>
@@ -62,7 +63,6 @@ class Node(threading.Thread):
         # Create a unique ID for each node if the ID is not given.
         if id == None:
             self.id = self.generate_id()
-
         else:
             self.id = str(id) # Make sure the ID is a string!
 
@@ -78,7 +78,7 @@ class Node(threading.Thread):
         # Set the logical time for every Node
         self.logical_time = 5 + time.monotonic()
         self.cs = 10
-
+        self.timestamp = 0
         # Set the default state to Do not want while starting the nodes
         self.state = State.DO_NOT_WANT
         
@@ -365,10 +365,20 @@ class Node(threading.Thread):
 
     def node_message(self, node, data):
         """This method is invoked when a node send us a message."""
-        self.debug_print("node_message: " + node.id + ": " + str(data))
-        print((self.id, "node_message: " + node.id + ": " + str(data)))
+        event, sender_id, timestamp = extra_data(data)
+        self.debug_print("node_message: " + sender_id + ": " + str(data))
+
+        if event == "ask_cs":
+            if self.state ==  State.DO_NOT_WANT:
+                print("ok")
+                self.send_to_node(node, data)
+        if event == "ok":
+            for node in self.node_inbound:
+                print("Node ------>", node)
+            print("OK")
+
         if self.callback is not None:
-            self.callback("node_message", self, node, data)
+            self.callback(event, self, sender_id, data)
 
     def node_disconnect_with_outbound_node(self, node):
         """This method is invoked just before the connection is closed with the outbound node. From the node

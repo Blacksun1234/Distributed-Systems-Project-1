@@ -120,7 +120,7 @@ class NodeConnection(threading.Thread):
                     buffer = buffer[eot_pos + 1:]
 
                     self.main_node.message_count_recv += 1
-                    self.main_node.node_message( self, self.parse_packet(packet) )
+                    self.main_node.node_message(self, self.parse_packet(packet))
 
                     eot_pos = buffer.find(self.EOT_CHAR)
 
