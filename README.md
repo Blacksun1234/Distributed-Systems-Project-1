@@ -22,7 +22,7 @@ When running the experiments on MacOS(2015), we noticed that randomly some messa
 - The 2 blue zones show how P1 didn't received the "ok" message due to the fact that the message was lost after succefully being sent by P2.
 
 
-<p align="center">Made with ❤ by Perceverance  and Emmanuel Cousin</p>
+<p align="center">Made with ❤ by Perseverance Ngoy and Emmanuel Cousin</p>
 
 ## Links to experiments
 - Experiment 1: https://drive.google.com/file/d/1ADY76kBftTAavW4xBq7tCo_dATIAeU5H/view?usp=sharing
