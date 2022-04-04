@@ -3,11 +3,8 @@ import time
 import threading
 import random
 import hashlib
-from tkinter import S
-from state import State
 
 from nodeconnection import NodeConnection
-from utilities import  build_data, extra_data
 
 """
 Author: Maurice Snoeren <macsnoeren(at)gmail.com>
@@ -31,7 +28,7 @@ class Node(threading.Thread):
                  connected_node: Which connected node caused the event.
                  data: The data that is send by the connected node."""
 
-    def __init__(self, port, id=None, callback=None, max_connections=0):
+    def __init__(self, host, port, id=None, callback=None, max_connections=0):
         """Create instance of a Node. If you want to implement the Node functionality with a callback, you should 
            provide a callback method. It is preferred to implement a new node by extending this Node class. 
             host: The host name or ip address that is used to bind the TCP/IP server to.
@@ -45,7 +42,7 @@ class Node(threading.Thread):
         self.terminate_flag = threading.Event()
 
         # Server details, host (or ip) to bind to and the port
-        self.host = "127.0.0.1"
+        self.host = host
         self.port = port
 
         # Events are send back to the given callback
@@ -63,6 +60,7 @@ class Node(threading.Thread):
         # Create a unique ID for each node if the ID is not given.
         if id == None:
             self.id = self.generate_id()
+
         else:
             self.id = str(id) # Make sure the ID is a string!
 
@@ -74,12 +72,6 @@ class Node(threading.Thread):
         self.message_count_send = 0
         self.message_count_recv = 0
         self.message_count_rerr = 0
-
-        # Set the logical time for every Node
-        self.logical_time = 5 + time.monotonic()
-        self.cs = 10
-        # Set the default state to Do not want while starting the nodes
-        self.state = State.DO_NOT_WANT
         
         # Connection limit of inbound nodes (nodes that connect to us)
         self.max_connections = max_connections
@@ -118,18 +110,6 @@ class Node(threading.Thread):
         print("Node connection overview:")
         print("- Total nodes connected with us: %d" % len(self.nodes_inbound))
         print("- Total nodes connected to     : %d" % len(self.nodes_outbound))
-    
-    # def set_state(self):
-    #     if self.state == State.DO_NOT_WANT:
-    #         self.time_out(self.logical_time, State.WANTED)
-    #     elif self.state == State.WANTED:
-    #         pass
-    #     elif self.state == State.HELD:
-    #         self.time_out(self.cs, State.DO_NOT_WANT)
-            
-    # def time_out(self, time_t, state):
-    #     time.sleep(time_t)
-    #     self.state = state
 
     def send_to_nodes(self, data, exclude=[]):
         """ Send a message to all the nodes that are connected with this node. data is a python variable which is
@@ -265,7 +245,7 @@ class Node(threading.Thread):
                     self.debug_print("reconnect_nodes: Removing node (" + node_to_check["host"] + ":" + str(node_to_check["port"]) + ") from the reconnection list!")
                     self.reconnect_to_nodes.remove(node_to_check)
 
-    def run(self):  
+    def run(self):
         """The main loop of the thread that deals with connections from other nodes on the network. When a
            node is connected it will exchange the node id's. First we receive the id of the connected node
            and secondly we will send our node id to the connected node. When connected the method
@@ -303,7 +283,7 @@ class Node(threading.Thread):
 
             time.sleep(0.01)
 
-        print("Node stopping...")
+        print("Node ", self.id,  " stopping...")
         for t in self.nodes_inbound:
             t.stop()
 
@@ -320,7 +300,7 @@ class Node(threading.Thread):
 
         self.sock.settimeout(None)   
         self.sock.close()
-        print("Node stopped")
+        print("Node ", self.id, " stopped")
 
     def outbound_node_connected(self, node):
         """This method is invoked when a connection with a outbound node was successfull. The node made
@@ -364,28 +344,9 @@ class Node(threading.Thread):
 
     def node_message(self, node, data):
         """This method is invoked when a node send us a message."""
-        event, sender_id, timestamp, port = extra_data(data)
-        self.debug_print("node_message: " + sender_id + ": " + str(data))
-      
-        if event == "ask_cs":
-            if self.state ==  State.DO_NOT_WANT:
-                print("Node id: ",self.id)
-                print("Node connections: ")
-                print(self.nodes_outbound)
-                # for i in self.nodes_outbound:
-                #     print("OBJECT ----> ", i)
-                # self.send_to_node(node, build_data("ok",self.node.id, self.logical_time, port))
-                # node.send(build_data("ok",self.node.id, self.logical_time, port))
-            if self.state == State.WANTED:
-                if self.logical_time < float(timestamp):
-                    pass
-        if event == "ok":
-            for node in self.node_inbound:
-                print("Node ------>", node)
-            print("OK")
-
+        self.debug_print("node_message: " + node.id + ": " + str(data))
         if self.callback is not None:
-            self.callback(event, self, sender_id, data)
+            self.callback("node_message", self, node, data)
 
     def node_disconnect_with_outbound_node(self, node):
         """This method is invoked just before the connection is closed with the outbound node. From the node
