@@ -99,15 +99,19 @@ def agrawala(sockets, running, number_of_processes):
     # print(f"Ricart-Agrawala begining with {number_of_processes} processes!")
     while running:
         for node in sorted(sockets, key=lambda node: node.id):
-            if node.state == State.DO_NOT_WANT:
-                time.sleep(node.logical_time)
-                node.state = State.WANTED
+            if node.id == "NODE_id_1":
+                # node.state = State.WANTED 
                 node.send_to_nodes(build_data("ask_cs", node.id, node.logical_time, node.port))
+                running = False
+            # if node.state == State.DO_NOT_WANT:
+            #     time.sleep(node.logical_time)
+            #     node.state = State.WANTED
+            #     node.send_to_nodes(build_data("ask_cs", node.id, node.logical_time, node.port))
                 
 
-            elif node.state == State.HELD:
-                time.sleep(node.logical_time)
-                node.state = State.DO_NOT_WANT
+            # elif node.state == State.HELD:
+            #     time.sleep(node.logical_time)
+            #     node.state = State.DO_NOT_WANT
                 #todo wait time p
         
 
