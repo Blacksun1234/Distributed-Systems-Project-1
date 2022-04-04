@@ -1,15 +1,18 @@
 # Distributed-Systems-Project-1
 
-## Requiered
-Python version 3.X (We used 3.9)
+## Requirements
+- Python version 3.X (We used 3.9)
+- sockets
+- _thread
 
-## How to use
-Start the program with the command ```python3 main.py <number of nodes>```
-- This will creat the specified number of nodes
-- Create the connections between thoses nodes
-- Start the Ricart-Agrawala algorithm
+
+## How to run the program
+Run ```python3 main.py <number of nodes>```
+
   
 ## Isuues Encountered
+When running the experiments on MacOS(2015), we noticed that randomly some messages are lost before arriving to destination. This causes some nodes no to get the responses needed therefore, they are stuck in waiting (in the current state). Several trials were performed but the source of the issue was not found, but a guess could that the used computer does no support the executions. Even though the algorithm work perfectly. This issue causes the program to stuck.
+
 <p align="center">
   <img src="https://github.com/Blacksun1234/Distributed-Systems-Project-1/blob/main/issues.png" width="900" alt="Preview" />
 </p>
@@ -20,3 +23,12 @@ Start the program with the command ```python3 main.py <number of nodes>```
 
 
 <p align="center">Made with ❤ by Perceverance  and Emmanuel Cousin</p>
+
+## Linked to experiments
+- Experiment 1: https://drive.google.com/file/d/1ADY76kBftTAavW4xBq7tCo_dATIAeU5H/view?usp=sharing
+- Experiment 2: https://drive.google.com/file/d/1uERIyezMOuzWR6KyjSmI_vJ2MRhi35hJ/view?usp=sharing
+- Experiment 3: https://drive.google.com/file/d/1rQgwJ6LVbTpRtbOl9-i8DXZZ2NWpCorg/view?usp=sharing
+
+## The base of our sockets communication relied upon the implementation from:
+- https://github.com/macsnoeren/python-p2p-network
+
